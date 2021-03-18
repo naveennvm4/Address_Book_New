@@ -1,194 +1,176 @@
 import java.util.*;
 
-public class AddressBook {
-    static Scanner input = new Scanner(System.in);
-    static String[] info;
-    static String name, addressBookName, firstName;
-    static ArrayList<String> namelist = new ArrayList<>();
-    static ArrayList<String> firstNameList  = new ArrayList<>();
-    static ArrayList<String> stateCitynameList = new ArrayList<>();
-    static ArrayList<String>  personNameList = new ArrayList<>();
-    static HashMap<String, HashMap> addressbooks = new HashMap<>();
-    static HashMap<String, String[]> contacts = new HashMap<>();
-    static HashMap<String, String> city = new HashMap<>();
-    static HashMap<String, String> state = new HashMap<>();
-    static String[] contact = new String[8];
-    static int index;
-    static int numOfContacts = 0;
+public class AddressBook{
+    Scanner sc = new Scanner(System.in);
+    Map<String, Map<Integer, Map<String, String>>> bookName= new HashMap<>();
+    Map<String, Map<String, String>> searchContacts = new HashMap<>();
+    String[] key = {"FirstName","LastName","Address","City","State","ZIP","PhoneNumber","Email"};
+    List<String> firstNameList = new ArrayList<>();
+    int numOfContact = 0;
 
-    public static String[] contactDetailsInput() {
-        System.out.println("Enter your details accordingly \n1. First Name\n2. Last Name\n"
-                + "3. House number\n4. City\n5. State\n6. Pin Code\n" +
-                "7.  Phone number\n8. e-mail");
-        for (int index = 0; index < contact.length; index++) {
-            System.out.print((index + 1)  + ".");
-            if (index == 0) {
-                firstNameDuplicacyCheck();
-            } else
-                contact[index] = input.next();
+    public void displayContacts(){
+        if(bookName.isEmpty()){
+            System.out.println("Please create a Address Book before you edit");
+            return;
         }
-        contacts.put(name, contact);
-        addressbooks.put(addressBookName, contacts);
-        city.put(contact[0], contact[3]);
-        state.put(contact[0], contact[4]);
-        stateCitynameList.add(contact[3]);
-        stateCitynameList.add(contact[4]);
-        numOfContacts++;
-        return contact;
+        bookName.entrySet().stream().forEachOrdered(System.out::println);
+        System.out.println("Enter the book name to be printed: ");
+        Map<Integer, Map<String, String>> contacts = bookName.get(sc.next());
+        contacts.values().stream().forEach(System.out::println);
     }
 
-    public static void firstNameDuplicacyCheck() {
-        boolean check = true;
-        while(check) {
-            firstName = input.next();
-            if (firstNameList.contains(firstName))
-                System.out.println("Name already exist,Try another name");
+    public void addContacts(String  name, int num) {
+        System.out.println("Enter Contact Details: ");
+        Map<Integer, Map<String, String>> contact = new HashMap<>();
+        Map<String, String> userInfo = new HashMap<>();
+        for(int i = 0; i<key.length; i++){
+            if ( i == 0){
+                System.out.println("Enter "+key[i]+": ");
+                userInfo.put(key[i], checkDuplicatesForFirstName());
+                continue;
+            }
+            System.out.println("Enter "+key[i]+": ");
+            userInfo.put(key[i], sc.next());
+        }
+        contact.put(num,userInfo);
+        searchContacts.put(userInfo.get("FirstName"), userInfo);
+        bookName.put(name, contact);
+    }
+
+    public void editContacts() {
+        if(bookName.isEmpty()){
+            System.out.println("Please create a book before you edit");
+            return;
+        }
+        System.out.println("Enter the firstName of the person contact to be edited: ");
+        String name = sc.next();
+        Set<String> keysBook = bookName.keySet();
+        for (String str : keysBook) {
+            Map<Integer, Map<String, String>> contacts = bookName.get(str);
+            int flag = 0;
+            Set<Integer> keysContact = contacts.keySet();
+            for (Integer i : keysContact){
+                Map user = (Map) contacts.get(i);
+                if (user.get("FirstName").equals(name)){
+                    flag= 1;
+                    System.out.println("Press the respective number you want to edit\n" +
+                            "1  First Name\n2 Last Name\n3 Address \n4 City\n5 State\n" +
+                            "6 Pin Code\n7 phone number\n8 email");
+                    int choice = sc.nextInt();
+                    System.out.println(key[choice-1]+" to be edited: ");
+                    user.put(key[choice-1],sc.next());
+                }
+            }
+            if (flag ==0) {
+                System.out.println("Name Not Found");
+            }
+        }
+    }
+
+    public void removeContacts() {
+        if(bookName.isEmpty()){
+            System.out.println("Please create a book before you display ");
+            return;
+        }
+        System.out.println("Enter the firstName of the person contact to be deleted");
+        String name = sc.next();
+        Set<String> keysBook = bookName.keySet();
+        for (String str : keysBook) {
+            Map<Integer, Map<String, String>> contacts = bookName.get(str);
+            int flag = 0;
+            Set<Integer> keysContact = contacts.keySet();
+            for (Integer i : keysContact){
+                HashMap user = (HashMap) contacts.get(i);
+                if (user.get("FirstName").equals(name)){
+                    flag= 1;
+                    contacts.remove(i);
+                    break;
+                }
+            }
+            if (flag ==0) {
+                System.out.println("Name Not Found");
+            }
+        }
+    }
+
+    public String checkDuplicatesForFirstName(){
+        while(true){
+            String firstName = sc.next();
+            if(firstNameList.contains(firstName.toLowerCase()))
+                System.out.println("Name already exists, PLease Try another name");
             else {
-                firstNameList.add(firstName);
-                contact[0] = firstName;
-                check = false;
+                firstNameList.add(firstName.toLowerCase());
+                return firstName;
             }
         }
     }
 
-    public static String[] updateContactDetails(String[] contact) {
-        System.out.println("Press the respective number you want to edit\n" +
-                "1  First Name\n2 Last Name\n3 House no.\n4 City\n5 State\n" +
-                "6 Pin Code\n7 phone number\n8 email");
-        int choose = input.nextInt();
-        if (choose >= 1 && choose <= 8) {
-            choose--;
-            System.out.println("Enter the new details you choose to edit");
-            contact[choose] = input.next();
+    void searchContactsByCityOrState(){
+        if(bookName.isEmpty()){
+            System.out.println("Please create a book before you search");
+            return;
         }
-        return contact;
-    }
-
-    public static void checkActions() {
-        boolean bool = true;
-        int action;
-        while(bool) {
-            System.out.println("Enter name of the address book where you stored the contact");
-            name = input.next();
-            if (namelist.contains(name)) {
-                contacts = addressbooks.get(name);
-                while (bool) {
-                    System.out.println("1. EDIT\n2. DELETE\n3. ADD NEW CONTACT\n4. Total Number of Contacts\nAnyNumber. EXIT");
-                    action = input.nextInt();
-                    switch (action) {
-                        case 1:
-                            System.out.println("Enter unique contact name");
-                            name = input.next();
-                            if (namelist.contains(name)) {
-                                info = contacts.get(name);
-                                info = updateContactDetails(info);
-                            }
-                            printContactDetails(info);
-                            break;
-                        case 2:
-                            System.out.println("Enter unique contact name");
-                            name = input.next();
-                            if (namelist.contains(name))
-                                namelist.remove(name);
-                            break;
-                        case 3:
-                            System.out.println("Enter a new contact name");
-                            name = addUniqueName();
-                            info = contactDetailsInput();
-                            for (int index = 0; index < info.length; index++)
-                                System.out.println(info[index]);
-                            break;
-                        case 4:
-                            System.out.println("Total Number of Contacts are " + numOfContacts);
-                        default:
-                            bool = false;
-                    }
-                }
-                bool = true;
-            }
-            else {
-                System.out.println("Press the following: \n1. Add New Addressbook\n" +
-                        "2. Existing Address Book\n3. To Search person in a State or City\nAny Number. Exit ");
-                action = input.nextInt();
-                switch(action) {
-                    case 1:
-                        programStart();
-                        break;
-                    case 2:
-                        break;
-                    case 3:
-                        searchPersons();
-                        break;
-                    default:
-                        bool = false;
+        System.out.println("Enter the city or state name to view persons in them");
+        String name = sc.next();
+        List<Integer> count = new ArrayList<>();
+        int flag = 0;
+        for (String str : bookName.keySet()) {
+            Map<Integer, Map<String, String>> contacts = bookName.get(str);
+            for (Integer i : contacts.keySet()) {
+                HashMap user = (HashMap) contacts.get(i);
+                System.out.println(contacts.get(i));
+                if (user.get("City").equals(name) | user.get("State").equals(name)){
+                    flag++;
+                    System.out.println(user.values());
                 }
             }
         }
+        if (flag ==0)
+            System.out.println("Name Not Found");
+        else
+            System.out.println("Number of Search Results found: "+flag);
     }
 
-    public static String addUniqueName() {
-        boolean check = true;
-        while(check) {
-            name = input.next();
-            if (namelist.contains(name))
-                System.out.println("Name already exist.Please try again with another name");
-            else {
-                namelist.add(name);
-                check = false;
-            }
-        }
-        return name;
+    public void sortTheMap(){
+        searchContacts.keySet().stream().sorted().forEach(System.out::println);
     }
 
-    public static void programStart() {
-        System.out.println("Enter unique name for Address Book");
-        addressBookName = addUniqueName();
-        System.out.println("Enter unique name for contacts book");
-        name = addUniqueName();
-        info = contactDetailsInput();
-    }
-
-    public static void printContactDetails(String[] info) {
-        for (index = 1; index <= info.length; index++) {
-            System.out.println(index + ". " + info[index]);
-        }
-    }
-
-    public static void searchPersons() {
-        personNameList = new ArrayList<>();
-        System.out.println("Enter the corresponding number \n1. city\n 2. state\n" +
-                "To search persons in them");
-        switch(input.nextInt()) {
-            case 1:
-                System.out.println("Enter the city name");
-                name = input.next();
-                if (stateCitynameList.contains(name)) {
-                    for (Map.Entry<String, String> firstName:city.entrySet()) {
-                        if ( firstName.getValue().equals(name))
-                            System.out.println(firstName.getKey());
-                    }
-                }
-                else { System.out.println("Invalid Name");}
-                break;
-            case 2:
-                System.out.println("Enter the state name");
-                name = input.next();
-                if (stateCitynameList.contains(name)) {
-                    for (Map.Entry getFirstName:state.entrySet()) {
-                        if (getFirstName.getValue().equals(name))
-                            System.out.println(getFirstName.getKey());
-                    }
-                }
-                else { System.out.println("Invalid Name");}
-                break;
-            default:
-                System.out.println("Invalid Input.Exiting, Try Again");
-        }
-    }
     public static void main(String[] args) {
-        System.out.println("Welcome to Address Book");
-        programStart();
-        checkActions();
-        System.out.println("THANK YOU");
+        AddressBook book = new AddressBook();
+        Scanner sc = new Scanner(System.in);
+        boolean exit = false;
+        while(!exit){
+            System.out.println("1. Add Contact\n2. Edit Entries\n3. Remove Entries\n4. Display Entries" +
+                                "\n5. Search by City or State\n6. Sort by name\n7. Exit");
+            int action = sc.nextInt();
+            switch (action){
+                case 1:
+                    System.out.println("Enter book name");
+                    String name = sc.next();
+                    book.addContacts(name, ++book.numOfContact);
+                    break;
+                case 2:
+                    book.editContacts();
+                    break;
+                case 3:
+                    book.removeContacts();
+                    break;
+                case 4:
+                    book.displayContacts();
+                    break;
+                case 5:
+                    book.searchContactsByCityOrState();
+                    break;
+                case 6:
+                    book.sortTheMap();
+                    break;
+                case 7:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid Choice Please try again");
+                    break;
+            }
+        }
     }
 }
