@@ -1,17 +1,15 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 public class AddressBook {
     static Scanner input = new Scanner(System.in);
-    static String[] info;
-    static String name, addressBookName;
+    static String[] info, personFirstname;
+    static String name, addressBookName, firstName;
     static ArrayList<String> namelist = new ArrayList<>();
     static ArrayList<String> firstNameList = new ArrayList<>();
     static HashMap<String, HashMap> addressbooks = new HashMap<>();
     static HashMap<String, String[]> contacts = new HashMap<>();
     static String[] contact = new String[8];
-    static String firstName;
+    static int index;
 
     public static String[] contactDetailsInput() {
         System.out.println("Enter your details accordingly \n1. First Name\n2. Last Name\n"
@@ -31,7 +29,7 @@ public class AddressBook {
 
     public static String[] firstNameDuplicacyCheck() {
         boolean check = true;
-        while (check) {
+        while(check) {
             firstName = input.next();
             if (firstNameList.contains(firstName))
                 System.out.println("Name already exist,Try another name");
@@ -43,7 +41,7 @@ public class AddressBook {
         }
         return contact;
     }
-
+    // To update the contact details if enquired for
     public static String[] updateContactDetails(String[] contact) {
         System.out.println("Press the respective number you want to edit\n" +
                 "1  First Name\n2 Last Name\n3 House no.\n4 City\n5 State\n" +
@@ -51,11 +49,12 @@ public class AddressBook {
         int choose = input.nextInt();
         if (choose >= 1 && choose <= 8) {
             choose--;
-            System.out.println("Enter the new details you choosed to edit");
+            System.out.println("Enter the new details you choose to edit");
             contact[choose] = input.next();
         }
         return contact;
     }
+
     public static void checkActions() {
         boolean bool = true;
         int action;
@@ -97,13 +96,17 @@ public class AddressBook {
                 bool = true;
             }
             else {
-                System.out.println("Press the following: \n1.Add New Address book\n2.Try Again\nAny Number.Exit ");
+                System.out.println("Press the following: \n1. Add New Addressbook\n" +
+                        "2. Existing Address Book\n3. To Search person in a State or City\nAny Number. Exit ");
                 action = input.nextInt();
                 switch(action) {
                     case 1:
                         programStart();
                         break;
                     case 2:
+                        break;
+                    case 3:
+                        searchPersons();
                         break;
                     default:
                         bool = false;
@@ -117,7 +120,7 @@ public class AddressBook {
         while(check) {
             name = input.next();
             if (namelist.contains(name))
-                System.out.println("Name already exist.Please try again with another name");
+                System.out.println("Name already exist Please try again with another name");
             else {
                 namelist.add(name);
                 check = false;
@@ -127,23 +130,42 @@ public class AddressBook {
     }
 
     public static void programStart() {
-        System.out.println("Enter a name of Address Book");
+        System.out.println("Enter unique name for Address Book");
         addressBookName = addUniqueName();
-        System.out.println("Enter a name of contacts");
+        System.out.println("Enter unique name for contacts book");
         name = addUniqueName();
         info = contactDetailsInput();
     }
 
     public static void printContactDetails(String[] info) {
-        for (int index = 1; index <= info.length; index++) {
+        for (index = 1; index <= info.length; index++) {
             System.out.println(index + ". " + info[index]);
         }
     }
-
+    // To search person by the name of city or state
+    public static void searchPersons() {
+        ArrayList<String> personNameList = new ArrayList<>();
+        System.out.println("Enter the city or state name to search persons");
+        name = input.next();;
+        for (Map.Entry getContacts:addressbooks.entrySet()) {
+            contacts = addressbooks.get(getContacts.getKey());
+            for (Map.Entry getInfo:contacts.entrySet()){
+                info = contacts.get(getInfo.getKey());
+                if ( info[3] == name || info[4] == name) {
+                    personNameList.add(info[0]);
+                }
+            }
+        }
+        System.out.println("The persons in the state or city you asked for are:");
+        Iterator itr=personNameList.iterator();
+        while(itr.hasNext()) {
+            System.out.println(itr.next());
+        }
+    }
     public static void main(String[] args) {
-        System.out.println("WELCOME to Address Book Program");
+        System.out.println("Welcome to Address Book");
         programStart();
         checkActions();
-        System.out.println("******THANK YOU******");
+        System.out.println("THANK YOU");
     }
 }
