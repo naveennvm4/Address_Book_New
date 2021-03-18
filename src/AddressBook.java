@@ -14,6 +14,7 @@ public class AddressBook {
     static HashMap<String, String> state = new HashMap<>();
     static String[] contact = new String[8];
     static int index;
+    static int numOfContacts = 0;
 
     public static String[] contactDetailsInput() {
         System.out.println("Enter your details accordingly \n1. First Name\n2. Last Name\n"
@@ -32,6 +33,7 @@ public class AddressBook {
         state.put(contact[0], contact[4]);
         stateCitynameList.add(contact[3]);
         stateCitynameList.add(contact[4]);
+        numOfContacts++;
         return contact;
     }
 
@@ -56,7 +58,7 @@ public class AddressBook {
         int choose = input.nextInt();
         if (choose >= 1 && choose <= 8) {
             choose--;
-            System.out.println("Enter the new details you choosed to edit");
+            System.out.println("Enter the new details you choose to edit");
             contact[choose] = input.next();
         }
         return contact;
@@ -71,7 +73,7 @@ public class AddressBook {
             if (namelist.contains(name)) {
                 contacts = addressbooks.get(name);
                 while (bool) {
-                    System.out.println("1. EDIT\n2. DELETE\n3. ADD NEW CONTACT\nAnyNumber. EXIT");
+                    System.out.println("1. EDIT\n2. DELETE\n3. ADD NEW CONTACT\n4. Total Number of Contacts\nAnyNumber. EXIT");
                     action = input.nextInt();
                     switch (action) {
                         case 1:
@@ -96,6 +98,8 @@ public class AddressBook {
                             for (int index = 0; index < info.length; index++)
                                 System.out.println(info[index]);
                             break;
+                        case 4:
+                            System.out.println("Total Number of Contacts are " + numOfContacts);
                         default:
                             bool = false;
                     }
@@ -103,7 +107,7 @@ public class AddressBook {
                 bool = true;
             }
             else {
-                System.out.println("Press the following: \n1. Add New Address book\n" +
+                System.out.println("Press the following: \n1. Add New Addressbook\n" +
                         "2. Existing Address Book\n3. To Search person in a State or City\nAny Number. Exit ");
                 action = input.nextInt();
                 switch(action) {
