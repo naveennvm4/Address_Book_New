@@ -2,12 +2,16 @@ import java.util.*;
 
 public class AddressBook {
     static Scanner input = new Scanner(System.in);
-    static String[] info, personFirstname;
+    static String[] info;
     static String name, addressBookName, firstName;
     static ArrayList<String> namelist = new ArrayList<>();
-    static ArrayList<String> firstNameList = new ArrayList<>();
+    static ArrayList<String> firstNameList  = new ArrayList<>();
+    static ArrayList<String> stateCitynameList = new ArrayList<>();
+    static ArrayList<String>  personNameList = new ArrayList<>();
     static HashMap<String, HashMap> addressbooks = new HashMap<>();
     static HashMap<String, String[]> contacts = new HashMap<>();
+    static HashMap<String, String> city = new HashMap<>();
+    static HashMap<String, String> state = new HashMap<>();
     static String[] contact = new String[8];
     static int index;
 
@@ -18,16 +22,20 @@ public class AddressBook {
         for (int index = 0; index < contact.length; index++) {
             System.out.print((index + 1)  + ".");
             if (index == 0) {
-                contact = firstNameDuplicacyCheck();
+                firstNameDuplicacyCheck();
             } else
                 contact[index] = input.next();
         }
         contacts.put(name, contact);
         addressbooks.put(addressBookName, contacts);
+        city.put(contact[0], contact[3]);
+        state.put(contact[0], contact[4]);
+        stateCitynameList.add(contact[3]);
+        stateCitynameList.add(contact[4]);
         return contact;
     }
 
-    public static String[] firstNameDuplicacyCheck() {
+    public static void firstNameDuplicacyCheck() {
         boolean check = true;
         while(check) {
             firstName = input.next();
@@ -39,9 +47,8 @@ public class AddressBook {
                 check = false;
             }
         }
-        return contact;
     }
-    // To update the contact details if enquired for
+
     public static String[] updateContactDetails(String[] contact) {
         System.out.println("Press the respective number you want to edit\n" +
                 "1  First Name\n2 Last Name\n3 House no.\n4 City\n5 State\n" +
@@ -49,7 +56,7 @@ public class AddressBook {
         int choose = input.nextInt();
         if (choose >= 1 && choose <= 8) {
             choose--;
-            System.out.println("Enter the new details you choose to edit");
+            System.out.println("Enter the new details you choosed to edit");
             contact[choose] = input.next();
         }
         return contact;
@@ -96,7 +103,7 @@ public class AddressBook {
                 bool = true;
             }
             else {
-                System.out.println("Press the following: \n1. Add New Addressbook\n" +
+                System.out.println("Press the following: \n1. Add New Address book\n" +
                         "2. Existing Address Book\n3. To Search person in a State or City\nAny Number. Exit ");
                 action = input.nextInt();
                 switch(action) {
@@ -120,7 +127,7 @@ public class AddressBook {
         while(check) {
             name = input.next();
             if (namelist.contains(name))
-                System.out.println("Name already exist Please try again with another name");
+                System.out.println("Name already exist.Please try again with another name");
             else {
                 namelist.add(name);
                 check = false;
@@ -142,24 +149,36 @@ public class AddressBook {
             System.out.println(index + ". " + info[index]);
         }
     }
-    // To search person by the name of city or state
+
     public static void searchPersons() {
-        ArrayList<String> personNameList = new ArrayList<>();
-        System.out.println("Enter the city or state name to search persons");
-        name = input.next();;
-        for (Map.Entry getContacts:addressbooks.entrySet()) {
-            contacts = addressbooks.get(getContacts.getKey());
-            for (Map.Entry getInfo:contacts.entrySet()){
-                info = contacts.get(getInfo.getKey());
-                if ( info[3] == name || info[4] == name) {
-                    personNameList.add(info[0]);
+        personNameList = new ArrayList<>();
+        System.out.println("Enter the corresponding number \n1. city\n 2. state\n" +
+                "To search persons in them");
+        switch(input.nextInt()) {
+            case 1:
+                System.out.println("Enter the city name");
+                name = input.next();
+                if (stateCitynameList.contains(name)) {
+                    for (Map.Entry<String, String> firstName:city.entrySet()) {
+                        if ( firstName.getValue().equals(name))
+                            System.out.println(firstName.getKey());
+                    }
                 }
-            }
-        }
-        System.out.println("The persons in the state or city you asked for are:");
-        Iterator itr=personNameList.iterator();
-        while(itr.hasNext()) {
-            System.out.println(itr.next());
+                else { System.out.println("Invalid Name");}
+                break;
+            case 2:
+                System.out.println("Enter the state name");
+                name = input.next();
+                if (stateCitynameList.contains(name)) {
+                    for (Map.Entry getFirstName:state.entrySet()) {
+                        if (getFirstName.getValue().equals(name))
+                            System.out.println(getFirstName.getKey());
+                    }
+                }
+                else { System.out.println("Invalid Name");}
+                break;
+            default:
+                System.out.println("Invalid Input.Exiting, Try Again");
         }
     }
     public static void main(String[] args) {
