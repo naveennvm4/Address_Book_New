@@ -4,6 +4,9 @@ public class AddressBook{
     Scanner sc = new Scanner(System.in);
     Map<String, Map<Integer, Map<String, String>>> bookName= new HashMap<>();
     Map<String, Map<String, String>> searchContacts = new HashMap<>();
+    Map<String, Map<String, String>> sortContactsByCity = new HashMap<>();
+    Map<String, Map<String, String>> sortContactsByState = new HashMap<>();
+    Map<String, Map<String, String>> sortContactsByZip= new HashMap<>();
     String[] key = {"FirstName","LastName","Address","City","State","ZIP","PhoneNumber","Email"};
     List<String> firstNameList = new ArrayList<>();
     int numOfContact = 0;
@@ -34,6 +37,9 @@ public class AddressBook{
         }
         contact.put(num,userInfo);
         searchContacts.put(userInfo.get("FirstName"), userInfo);
+        sortContactsByCity.put(userInfo.get("City"), userInfo);
+        sortContactsByState.put(userInfo.get("State"), userInfo);
+        sortContactsByState.put(userInfo.get("ZIP"), userInfo);
         bookName.put(name, contact);
     }
 
@@ -133,6 +139,9 @@ public class AddressBook{
 
     public void sortTheMap(){
         searchContacts.keySet().stream().sorted().forEach(System.out::println);
+        sortContactsByCity.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(System.out::println);
+        sortContactsByState.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(System.out::println);
+        sortContactsByZip.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(System.out::println);
     }
 
     public static void main(String[] args) {
